@@ -149,28 +149,28 @@
     - sos
     - psacct
 
-  - name: Install some optional software
-    yum:
-      name: '{{ item }}'
-      state: installed
-    with_items:
-    - vim-enhanced
-    - tmux
-    - unzip
-    - tcpdump
-    - telnet
-    - strace
-    - man-pages
-    - man
-    - iptraf
-    - wget
-    - openssh-clients
-    - httpd-tools
-    - net-tools
-    - nfs-utils
-    - yum-utils
-    - openldap-clients
-    tags: rpm
+#  - name: Install some optional software
+#    yum:
+#      name: '{{ item }}'
+#      state: installed
+#    with_items:
+#    - vim-enhanced
+#    - tmux
+#    - unzip
+#    - tcpdump
+#    - telnet
+#    - strace
+#    - man-pages
+#    - man
+#    - iptraf
+#    - wget
+#    - openssh-clients
+#    - httpd-tools
+#    - net-tools
+#    - nfs-utils
+#    - yum-utils
+#    - openldap-clients
+#    tags: rpm
 
   - name: Install NetworkManager
     yum:
@@ -325,62 +325,62 @@
     with_items:
       - rhel-7-server-rpms
       - rhel-7-server-extras-rpms
-      - rhel-7-server-ose-{{ ocp_version }}-rpms
+      - rhel-7-server-ose-3.11-rpms
       - rhel-7-server-ansible-2.6-rpms
     tags: rpm
 
-  - name: Install Docker
-    yum:
-      name: 'docker-{{ docker_version }}'
-      state: installed
-    tags: rpm,docker
+#  - name: Install Docker
+#    yum:
+#      name: 'docker-{{ docker_version }}'
+#      state: installed
+#    tags: rpm,docker
 
-  - name: Find the filesystem hosting /var/lib/docker
-    command: df -k /var/lib/docker
-    register: df
-    changed_when: false
-    tags: docker
+#  - name: Find the filesystem hosting /var/lib/docker
+#    command: df -k /var/lib/docker
+#    register: df
+#    changed_when: false
+#    tags: docker
 
-  - name: Make sure the filesystem hosting /var/lib/docker is formatted as XFS
-    assert:
-      that:
-      - 'docker_filesystem == ''xfs'''
-      msg: "The filesystem holding /var/lib/docker must be formatted as XFS"
-    vars:
-      docker_mount_point: '{{ df.stdout_lines[1].split()[5] }}'
-      # TODO: replace match with "equalto" as soon as the Jinja shipped with RHEL is updated
-      docker_filesystem: '{{ ansible_mounts|selectattr(''mount'', ''match'', ''^'' ~ docker_mount_point ~ ''$'')|map(attribute=''fstype'' )|first }}'
-    tags: docker
+#  - name: Make sure the filesystem hosting /var/lib/docker is formatted as XFS
+#    assert:
+#      that:
+#      - 'docker_filesystem == ''xfs'''
+#      msg: "The filesystem holding /var/lib/docker must be formatted as XFS"
+#    vars:
+#      docker_mount_point: '{{ df.stdout_lines[1].split()[5] }}'
+#      # TODO: replace match with "equalto" as soon as the Jinja shipped with RHEL is updated
+#      docker_filesystem: '{{ ansible_mounts|selectattr(''mount'', ''match'', ''^'' ~ docker_mount_point ~ ''$'')|map(attribute=''fstype'' )|first }}'
+#    tags: docker
       
-  - name: Stop Docker
-    service:
-      name: docker
-      state: stopped
-      enabled: yes
-    tags: docker
+#  - name: Stop Docker
+#    service:
+#      name: docker
+#      state: stopped
+#      enabled: yes
+#    tags: docker
 
-  - name: Make sure overlayfs is enabled
-    lineinfile:
-      path: /etc/sysconfig/docker-storage
-      line: 'DOCKER_STORAGE_OPTIONS="--storage-driver overlay2"'
-      regexp: '^ *DOCKER_STORAGE_OPTIONS='
-      state: present
-    register: docker_storage
-    tags: docker
+#  - name: Make sure overlayfs is enabled
+#    lineinfile:
+#      path: /etc/sysconfig/docker-storage
+#      line: 'DOCKER_STORAGE_OPTIONS="--storage-driver overlay2"'
+#      regexp: '^ *DOCKER_STORAGE_OPTIONS='
+#      state: present
+#    register: docker_storage
+#    tags: docker
 
-  - name: Cleanup the Docker local storage
-    file:
-      path: /var/lib/docker
-      state: absent
-    tags: docker
-    when: docker_storage.changed
+#  - name: Cleanup the Docker local storage
+#    file:
+#      path: /var/lib/docker
+#      state: absent
+#    tags: docker
+#    when: docker_storage.changed
 
-  - name: Start Docker
-    service:
-      name: docker
-      state: started
-      enabled: yes
-    tags: docker
+#  - name: Start Docker
+#    service:
+#      name: docker
+#      state: started
+#      enabled: yes
+#    tags: docker
 
   - name: Install openshift-ansible
     yum:
